@@ -1,0 +1,3 @@
+# Optional - only needed for the browser part of tests/test_e2e.py
+playwright>=1.40
+# then run once:  python -m playwright install chromium

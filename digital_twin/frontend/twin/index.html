@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Digital Twin – Smart Building</title>
+  <link rel="stylesheet" href="css/twin.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene" aria-label="Interactive 3D model of the simulated smart building"></canvas>
+    <div id="labels" aria-hidden="true"></div>
+
+    <header id="topbar">
+      <div class="brand">
+        <span class="title">3D Digital Twin</span>
+        <span class="badge sim" title="All readings come from the software building simulation. No physical sensors are connected.">SIMULATED DATA</span>
+      </div>
+      <div class="clock">
+        <span id="run-state" class="pill">–</span>
+        <span>Simulated time <b id="sim-time">–</b></span>
+      </div>
+      <div id="conn" class="conn">Connecting…</div>
+    </header>
+
+    <aside id="controls" class="panel">
+      <section>
+        <h3>Simulation</h3>
+        <div class="row">
+          <button id="btn-run" class="btn primary" type="button">Pause</button>
+          <button id="btn-reset" class="btn" type="button" title="Re-initialise all rooms from the seed. Stored history is kept.">Reset</button>
+        </div>
+        <label class="field">Speed
+          <div id="speed" class="seg" role="group" aria-label="Simulation speed"></div>
+        </label>
+        <label class="check"><input id="auto-control" type="checkbox" checked>
+          Apply rule-engine actions to the building</label>
+        <p class="hint">When on, HVAC ON/OFF and DIM LIGHTS decisions change the simulated rooms (closed loop).</p>
+      </section>
+      <section>
+        <h3>View</h3>
+        <div id="floor-view" class="seg" role="group" aria-label="Visible floors"></div>
+        <label class="check"><input id="explode" type="checkbox" checked> Separate floors</label>
+        <label class="check"><input id="show-labels" type="checkbox" checked> Room labels</label>
+        <button id="btn-camera" class="btn wide" type="button">Reset view</button>
+      </section>
+      <section class="legend">
+        <h3>Legend</h3>
+        <div class="lg"><i style="background:var(--normal)"></i>Normal</div>
+        <div class="lg"><i style="background:var(--warning)"></i><span>Warning – power &gt; <span class="th-power">2.0</span> kW, or occupied at ≥ <span class="th-temp">26</span> °C</span></div>
+        <div class="lg"><i style="background:var(--critical)"></i><span>Critical – AI fault probability &gt; <span class="th-fault">52%</span></span></div>
+        <div class="lg"><i style="background:var(--unknown)"></i>No data</div>
+        <div class="lg small"><span>HVAC LED: <i class="dot" style="background:#22c55e"></i> running <i class="dot" style="background:#9ca3af"></i> off <i class="dot" style="background:#ef4444"></i> fault</span></div>
+        <div class="lg small">Bright ceiling panels = lights on · people = room occupied</div>
+      </section>
+    </aside>
+
+    <aside id="room-panel" class="panel">
+      <div id="room-empty" class="empty">Click a room in the building to see its sensor readings.</div>
+      <div id="room-body" hidden>
+        <div class="room-head">
+          <div>
+            <div id="room-name" class="room-name"></div>
+            <div id="room-sub" class="room-sub"></div>
+          </div>
+          <span id="room-status" class="status"></span>
+        </div>
+        <ul id="room-reasons" class="reasons"></ul>
+        <h4>Sensor readings <span class="tag sensor">SENSOR DATA</span></h4>
+        <table id="sensor-table" class="kv"></table>
+        <div id="reading-time" class="muted"></div>
+        <div class="sparks">
+          <div><span>Temperature (°C), last readings</span><canvas id="spark-temp" height="40"></canvas></div>
+          <div><span>Power (kW), last readings</span><canvas id="spark-power" height="40"></canvas></div>
+        </div>
+        <h4>AI outputs <span class="tag ai">AI PREDICTION</span></h4>
+        <table id="ai-table" class="kv"></table>
+        <h4>Equipment</h4>
+        <table id="equip-table" class="kv"></table>
+        <div class="row">
+          <label class="field half">HVAC
+            <select id="hvac-mode"><option value="auto">Auto (rule engine)</option><option value="on">On</option><option value="off">Off</option></select>
+          </label>
+          <label class="field half">Lights
+            <select id="lights-mode"><option value="auto">Auto (occupancy)</option><option value="on">On</option><option value="dim">Dim</option><option value="off">Off</option></select>
+          </label>
+        </div>
+        <h4>Test scenario</h4>
+        <div id="scenario-active" class="scenario-active" hidden></div>
+        <div class="row">
+          <select id="scenario-kind" aria-label="Scenario"></select>
+          <select id="scenario-min" aria-label="Duration (simulated minutes)">
+            <option value="10">10 min</option><option value="15" selected>15 min</option><option value="30">30 min</option><option value="60">60 min</option>
+          </select>
+        </div>
+        <div class="row">
+          <button id="btn-scenario" class="btn warn" type="button">Trigger</button>
+          <button id="btn-clear" class="btn" type="button">Clear</button>
+        </div>
+        <p class="hint">Durations are simulated time. Use a higher speed to see slow effects such as heating sooner.</p>
+      </div>
+    </aside>
+
+    <div id="hint" class="hint-bar">Drag to rotate · Right-drag or Shift-drag to pan · Scroll to zoom · Click a room to inspect it</div>
+    <div id="fatal" class="fatal" hidden></div>
+  </div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
